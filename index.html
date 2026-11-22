@@ -104,6 +104,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .for{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
 .for li{display:flex;gap:10px;font-size:15px;line-height:1.45;color:#E4EEF3}
 .for li .e{flex:0 0 22px;font-size:18px;line-height:1.25}
+.path{list-style:none;padding:0;margin:0;display:grid;gap:0;position:relative}
+.path li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.45;color:#E4EEF3;padding:9px 0;border-bottom:1px dashed rgba(39,224,198,.18)}
+.path li:last-child{border-bottom:0}
+.path li .e{flex:0 0 24px;font-size:19px;line-height:1.2}
 .arrow{text-align:center;font-size:24px;margin:12px 0 6px}
 .promise{background:rgba(39,224,198,.1);border:1px solid rgba(39,224,198,.35);border-radius:16px;padding:14px 16px;font-size:16.5px;line-height:1.45;font-weight:800;text-align:center;text-wrap:balance}
 .promise span{color:var(--teal)}
@@ -212,15 +216,6 @@ const TYPES = [
   tips:[["☀️","Яркий свет утром — твой главный инструмент. Выйди на улицу хотя бы на 10 минут."],["🌆","Вечером, наоборот, приглушай свет и убирай экраны: яркий свет поздно сдвигает часы ещё дальше."],["⏰","Сдвигай отбой постепенно, по 15–20 минут, а не на 2 часа за раз."],["🩺","Если график учёбы или работы никак не совпадает с ритмом и ты постоянно недосыпаешь, обсуди это с врачом-сомнологом."]]},
 ];
 
-/* Личная фраза перед предложением клуба, по типу (ключ = нижняя граница баллов) */
-const HOOK = {
-  70:"Утро у тебя уже есть. Осталось наполнить его полезными привычками, которые останутся надолго.",
-  59:"Твой ритм — хорошая база. Осталось закрепить привычки, которые будут работать на тебя каждый день.",
-  42:"Ты легко подстраиваешься под любой график. Но без опоры гибкость быстро превращается в хаос.",
-  31:"Перестроить режим в одиночку тяжело: вечер снова затягивает. Вместе это намного проще.",
-  16:"Мир живёт по утреннему расписанию, и сове особенно трудно держать режим в одиночку."
-};
-
 /* ===== ЛОГИКА ===== */
 const app = document.getElementById('app');
 let ans = new Array(Q.length).fill(null);
@@ -309,7 +304,7 @@ function result(){
 
   <div class="box club">
     <h3>Знать свой хронотип — полдела <span class="e">🤝</span></h3>
-    <p>${HOOK[t.min]}</p>
+    <p>Главное — что ты с этим сделаешь. Сон, энергия и привычки меняются не от знаний, а от ежедневных маленьких действий.</p>
     <p style="margin-top:16px"><b style="color:var(--teal)">Челленджология</b> — для тех, кто:</p>
     <ul class="for">
       <li><span class="e">⏳</span><span>хочет развиваться, но постоянно откладывает или бросает;</span></li>
@@ -327,6 +322,14 @@ function result(){
       <div><span class="e">🎁</span><span><b>Бонусы и призы</b></span></div>
       <div><span class="e">👥</span><span><b>Сильное окружение</b></span></div>
     </div>
+    <h3 style="margin-top:22px">Хватит ждать подходящего момента <span class="e">⏰</span></h3>
+    <ol class="path">
+      <li><span class="e">1️⃣</span><span>Заходи в Челленджологию</span></li>
+      <li><span class="e">2️⃣</span><span>Определи свою цель</span></li>
+      <li><span class="e">3️⃣</span><span>Выбирай челлендж</span></li>
+      <li><span class="e">4️⃣</span><span>Начинай системно менять себя вместе с людьми, которые тоже хотят стать лучше</span></li>
+      <li><span class="e">5️⃣</span><span>Получай бонусы и призы за регулярность и саморазвитие</span></li>
+    </ol>
     ${JOIN_URL ? `<a class="cta" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
                : `<button class="cta" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
     <p class="note">Откроется Телеграм-бот: там подробно о клубе, стоимость и оплата</p>
