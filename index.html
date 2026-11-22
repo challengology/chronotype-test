@@ -94,6 +94,19 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .scale .track{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#3B4FB8,#2A7FD0,#27C6B9,#9ED46A,#F6C35B)}
 .scale .pin{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;background:#fff;border:4px solid var(--navy);box-shadow:0 0 0 3px var(--teal);transform:translate(-50%,-50%)}
 .scale .lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:10px;font-weight:600}
+.legend{display:grid;gap:6px;margin-top:16px}
+.legend div{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;font-size:14px;color:var(--muted);border:1px solid transparent;font-variant-numeric:tabular-nums}
+.legend div .e{font-size:18px}
+.legend div b{font-weight:700;color:var(--muted)}
+.legend div.me{background:#0D2E35;border-color:var(--teal);color:var(--fg)}
+.legend div.me b{color:var(--teal)}
+.legend div.me::after{content:"← ты здесь";grid-column:2/-1;font-size:12px;font-weight:800;color:var(--teal);margin-top:-2px}
+.for{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.for li{display:flex;gap:10px;font-size:15px;line-height:1.45;color:#E4EEF3}
+.for li .e{flex:0 0 22px;font-size:18px;line-height:1.25}
+.arrow{text-align:center;font-size:24px;margin:12px 0 6px}
+.promise{background:rgba(39,224,198,.1);border:1px solid rgba(39,224,198,.35);border-radius:16px;padding:14px 16px;font-size:16.5px;line-height:1.45;font-weight:800;text-align:center;text-wrap:balance}
+.promise span{color:var(--teal)}
 .list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
 .list li{display:flex;gap:12px;font-size:15px;line-height:1.5}
 .list li .e{font-size:19px;line-height:1.3;flex:0 0 22px}
@@ -199,6 +212,15 @@ const TYPES = [
   tips:[["☀️","Яркий свет утром — твой главный инструмент. Выйди на улицу хотя бы на 10 минут."],["🌆","Вечером, наоборот, приглушай свет и убирай экраны: яркий свет поздно сдвигает часы ещё дальше."],["⏰","Сдвигай отбой постепенно, по 15–20 минут, а не на 2 часа за раз."],["🩺","Если график учёбы или работы никак не совпадает с ритмом и ты постоянно недосыпаешь, обсуди это с врачом-сомнологом."]]},
 ];
 
+/* Личная фраза перед предложением клуба, по типу (ключ = нижняя граница баллов) */
+const HOOK = {
+  70:"Утро у тебя уже есть. Осталось наполнить его полезными привычками, которые останутся надолго.",
+  59:"Твой ритм — хорошая база. Осталось закрепить привычки, которые будут работать на тебя каждый день.",
+  42:"Ты легко подстраиваешься под любой график. Но без опоры гибкость быстро превращается в хаос.",
+  31:"Перестроить режим в одиночку тяжело: вечер снова затягивает. Вместе это намного проще.",
+  16:"Мир живёт по утреннему расписанию, и сове особенно трудно держать режим в одиночку."
+};
+
 /* ===== ЛОГИКА ===== */
 const app = document.getElementById('app');
 let ans = new Array(Q.length).fill(null);
@@ -275,6 +297,9 @@ function result(){
     <div class="track"><span class="pin" style="left:${pos}%"></span></div>
     <div class="lbls"><span>🦉 Сова</span><span>🕊️ Голубь</span><span>🐓 Жаворонок</span></div>
   </div>
+  <div class="legend">
+    ${[...TYPES].reverse().map(x=>`<div class="${x===t?'me':''}"><span class="e">${x.ic}</span><span>${x.name.split(':')[0]}</span><b>${x.min}–${x.max}</b></div>`).join('')}
+  </div>
 
   <div class="box"><h3><span class="e">🔍</span> ЧТО ЭТО ЗНАЧИТ</h3><p style="margin:0;font-size:15.5px;line-height:1.6;color:#D5E2EA">${t.about}</p></div>
 
@@ -283,8 +308,16 @@ function result(){
   </div>
 
   <div class="box club">
-    <h3>Знать свой хронотип — полдела. <span class="e">🤝</span><br>Наладить режим проще вместе</h3>
-    <p><b style="color:var(--teal)">Челленджология</b> — сообщество, в котором ты каждую неделю вместе с единомышленниками превращаешь полезные знания в реальные действия через 7-дневные челленджи. Сам голосуешь за новые испытания, выбираешь, в каких участвовать, и постепенно создаёшь привычки, которые меняют твою жизнь.</p>
+    <h3>Знать свой хронотип — полдела <span class="e">🤝</span></h3>
+    <p>${HOOK[t.min]}</p>
+    <p style="margin-top:16px"><b style="color:var(--teal)">Челленджология</b> — для тех, кто:</p>
+    <ul class="for">
+      <li><span class="e">⏳</span><span>хочет развиваться, но постоянно откладывает или бросает;</span></li>
+      <li><span class="e">🧭</span><span>хочет изменить свою жизнь, но не знает, с чего начать;</span></li>
+      <li><span class="e">🔋</span><span>устал от разовых марафонов и мотивации на пару дней.</span></li>
+    </ul>
+    <div class="arrow e">⬇️</div>
+    <div class="promise">Сформируй полезные привычки <span>в игровом формате</span> с помощью 7-дневных челленджей в окружении единомышленников</div>
     <div class="feat">
       <div class="wide"><span class="e">🌙</span><span><b>3 сферы саморазвития:</b> сон, питание, физическая активность</span></div>
       <div><span class="e">🔥</span><span><b>55 челленджей</b></span></div>
@@ -294,13 +327,14 @@ function result(){
     </div>
     ${JOIN_URL ? `<a class="cta" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
                : `<button class="cta" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
+    <p class="note">Откроется Телеграм-бот: там подробно о клубе, стоимость и оплата</p>
   </div>
 
   <div class="row2">
     <button class="ghost" id="share"><span class="e">📤</span> Поделиться результатом</button>
     <button class="ghost" id="again"><span class="e">🔁</span> Пройти заново</button>
   </div>
-  <p class="src">Опросник Хорна-Остберга (Morningness-Eveningness Questionnaire), 1976. Шкала: 16–30 сова, 31–41 умеренная сова, 42–58 промежуточный тип, 59–69 умеренный жаворонок, 70–86 жаворонок. Тест не является медицинской диагностикой.</p>`;
+  <p class="src">Опросник Хорна-Остберга (Morningness-Eveningness Questionnaire), 1976. Тест не является медицинской диагностикой.</p>`;
   document.getElementById('again').onclick = () => { ans = new Array(Q.length).fill(null); start(); };
   const j = document.getElementById('join'); if (j) j.onclick = () => toast('Ссылка на вступление скоро появится 🙌');
   document.getElementById('share').onclick = () => {
