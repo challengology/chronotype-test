@@ -174,6 +174,10 @@ img.lk{height:1.15em;width:auto;vertical-align:-0.22em;display:inline-block}
   .types,.feat{grid-template-columns:1fr}
   .stat b{font-size:22px}
 }
+.sci{display:flex;align-items:center;justify-content:center;gap:8px;width:fit-content;max-width:100%;margin:12px auto 0;padding:9px 16px;border-radius:99px;background:rgba(39,224,198,.1);border:1px solid rgba(39,224,198,.35);font-size:14px;color:#D5E2EA;text-align:center}
+.sci b{color:var(--teal);font-weight:800}
+.sci .e{font-size:16px}
+
 /* ===== АНИМАЦИИ ===== */
 /* 1. Логотип рисуется сам */
 .logo-anim path{stroke-dasharray:84;stroke-dashoffset:84;animation:draw .9s .35s cubic-bezier(.6,0,.3,1) forwards}
@@ -377,6 +381,7 @@ function start(){
     <div class="stat"><b>~3</b><span>минуты</span></div>
     <div class="stat"><b>5</b><span>типов</span></div>
   </div>
+  <div class="sci rise" style="animation-delay:1.28s"><span class="e">🔬</span><span><b>Научная методика</b> · Хорн и Остберг, 1976</span></div>
   <div class="box">
     <h3>КАКИМ ТЫ МОЖЕШЬ ОКАЗАТЬСЯ:</h3>
     <div class="types">
@@ -389,7 +394,7 @@ function start(){
   </div>
   <button class="cta rise" id="go" style="animation-delay:1.35s">НАЧАТЬ ТЕСТ <span aria-hidden="true">→</span></button>
   <p class="note">Отвечай так, как тебе комфортно, а не как приходится жить по графику. Опирайся на последние несколько недель. Бесплатно.</p>
-  <p class="src">Основано на опроснике Хорна-Остберга (J. Horne, O. Östberg, 1976). Это самый известный в мире тест на хронотип. Результат помогает понять себя, но не является медицинским диагнозом.</p>`;
+  <p class="src">Самый известный в мире тест на хронотип</p>`;
   document.getElementById('go').onclick = () => { i = 0; dir = 1; question(); };
   scrollTo(0,0);
 }
