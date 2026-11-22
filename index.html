@@ -11,12 +11,12 @@
 <meta property="og:url" content="https://challengology.github.io/chronotype-test/">
 <meta property="og:title" content="Сова или жаворонок? Тест на хронотип">
 <meta property="og:description" content="Узнай свой природный ритм за 3 минуты: когда тебе легче думать, тренироваться и засыпать. Бесплатно.">
-<meta property="og:image" content="https://challengology.github.io/chronotype-test/og.png">
+<meta property="og:image" content="https://challengology.github.io/chronotype-test/og-lark.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="ru_RU">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://challengology.github.io/chronotype-test/og.png">
+<meta name="twitter:image" content="https://challengology.github.io/chronotype-test/og-lark.png">
 <meta name="theme-color" content="#03080C">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap">
 <style>
@@ -70,6 +70,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .type{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px}
 .type .ic{font-size:26px;line-height:1}
+img.lk{height:1.15em;width:auto;vertical-align:-0.22em;display:inline-block}
 .type b{display:block;font-size:15px}
 .type span{font-size:12.5px;color:var(--muted)}
 
@@ -239,7 +240,7 @@ const Q = [
 
 /* ===== РЕЗУЛЬТАТЫ ===== */
 const TYPES = [
- {min:70,max:86,ic:"🐓",name:"Ярко выраженный жаворонок",short:"Утро — твоё суперсостояние",
+ {min:70,max:86,ic:"🐦",img:true,name:"Ярко выраженный жаворонок",short:"Утро — твоё суперсостояние",
   about:"Ты просыпаешься легко и сразу включаешься в дела. Пик энергии и ясности у тебя в первой половине дня, а к вечеру силы заметно тают.",
   tips:[["🧠","Самые сложные задачи ставь на утро, до обеда. Это твои золотые часы."],["🏃","Тренировки утром или днём зайдут лучше, чем поздно вечером."],["🌙","Поздние встречи и вечеринки сбивают тебе режим сильнее, чем другим. Береги вечер."],["🔁","Не отсыпайся до обеда в выходные: держи подъём примерно в одно время."]]},
  {min:59,max:69,ic:"🌤️",name:"Умеренный жаворонок",short:"Скорее утренний человек",
@@ -255,6 +256,10 @@ const TYPES = [
   about:"Утро для тебя испытание, а голова по-настоящему включается вечером и ночью. Тело живёт по своим часам, и если жить против них, накапливается недосып.",
   tips:[["☀️","Яркий свет утром — твой главный инструмент. Выйди на улицу хотя бы на 10 минут."],["🌆","Вечером, наоборот, приглушай свет и убирай экраны: яркий свет поздно сдвигает часы ещё дальше."],["⏰","Сдвигай отбой постепенно, по 15–20 минут, а не на 2 часа за раз."],["🩺","Если график учёбы или работы никак не совпадает с ритмом и ты постоянно недосыпаешь, обсуди это с врачом-сомнологом."]]},
 ];
+
+/* Жаворонок — картинка (такого эмодзи не существует), в тексте «Поделиться» — 🐦 */
+const LARK = '<img class="lk" src="lark.png" alt="жаворонок">';
+const icon = x => x.img ? LARK : x.ic;
 
 /* ===== ЛОГИКА ===== */
 const app = document.getElementById('app');
@@ -277,7 +282,7 @@ function start(){
   <div class="box">
     <h3>КАКИМ ТЫ МОЖЕШЬ ОКАЗАТЬСЯ:</h3>
     <div class="types">
-      <div class="type"><span class="ic e">🐓</span><div><b>Жаворонок</b><span>Пик энергии утром</span></div></div>
+      <div class="type"><span class="ic e">${LARK}</span><div><b>Жаворонок</b><span>Пик энергии утром</span></div></div>
       <div class="type"><span class="ic e">🌤️</span><div><b>Умеренный жаворонок</b><span>Скорее утренний</span></div></div>
       <div class="type"><span class="ic e">🕊️</span><div><b>Голубь</b><span>Гибкий, дневной ритм</span></div></div>
       <div class="type"><span class="ic e">🌙</span><div><b>Умеренная сова</b><span>Скорее вечерний</span></div></div>
@@ -327,17 +332,17 @@ function result(){
   const pos = (score-16)/(86-16)*100;
   app.innerHTML = `
   <div class="mini"><div class="t"><b>ЧЕЛЛЕНДЖОЛОГИЯ</b> · твой результат</div>${logo('')}</div>
-  <div class="res-type e">${t.ic}</div>
+  <div class="res-type e">${icon(t)}</div>
   <div class="eyebrow" style="margin-top:14px">ТВОЙ ХРОНОТИП</div>
   <h1 class="title" style="font-size:clamp(28px,7vw,40px)">${t.name.toUpperCase()}</h1>
   <p class="lead">${t.short}</p>
   <div class="score"><b>${score}</b><span>баллов из 86</span></div>
   <div class="scale" aria-label="Шкала от совы до жаворонка">
     <div class="track"><span class="pin" style="left:${pos}%"></span></div>
-    <div class="lbls"><span>🦉 Сова</span><span>🕊️ Голубь</span><span>🐓 Жаворонок</span></div>
+    <div class="lbls"><span>🦉 Сова</span><span>🕊️ Голубь</span><span>${LARK} Жаворонок</span></div>
   </div>
   <div class="legend">
-    ${[...TYPES].reverse().map(x=>`<div class="${x===t?'me':''}"><span class="e">${x.ic}</span><span>${x.name.split(':')[0]}</span><b>${x.min}–${x.max}</b></div>`).join('')}
+    ${[...TYPES].reverse().map(x=>`<div class="${x===t?'me':''}"><span class="e">${icon(x)}</span><span>${x.name.split(':')[0]}</span><b>${x.min}–${x.max}</b></div>`).join('')}
   </div>
 
   <div class="box"><h3><span class="e">🔍</span> ЧТО ЭТО ЗНАЧИТ</h3><p style="margin:0;font-size:15.5px;line-height:1.6;color:#D5E2EA">${t.about}</p></div>
