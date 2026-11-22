@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сова или жаворонок</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Тест на хронотип Хорна-Остберга от Челленджологии: узнай, сова ты или жаворонок, за 3 минуты.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap">
+<style>
+/* Layout: одна колонка до 640px, один экран = один шаг (старт → вопрос → результат), как в «Колесе привычек» */
+:root{
+  --bg:#03080C; --panel:#0A1C27; --panel2:#0B202D; --line:#1B3C4D;
+  --fg:#F2F7FA; --muted:#9DB3C1; --teal:#27E0C6; --cyan:#1EC8E8; --navy:#0B2539;
+  --warm:#F6C35B;
+  --f-body:'Manrope',Arial,sans-serif; --f-emoji:'Noto Color Emoji','Apple Color Emoji','Segoe UI Emoji',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body),var(--f-emoji);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(0,99,120,.53) 0, transparent 30%),
+    radial-gradient(at 100% 90%, rgba(0,185,176,.45) 0, transparent 30%),
+    radial-gradient(at 7% 100%, rgba(6,49,103,.53) 0, transparent 26%);
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  -webkit-font-smoothing:antialiased;
+}
+.e{font-family:var(--f-emoji);font-weight:400;font-style:normal}
+.wrap{max-width:640px;margin:0 auto;padding-block:28px 48px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+
+/* brand */
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.logo{width:96px;height:96px}
+.brand b{font-size:21px;font-weight:800;margin-top:6px}
+.brand span{font-size:13px;color:var(--muted)}
+.mini{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.mini .t{font-size:13px;color:var(--muted)} .mini .t b{color:var(--teal);font-weight:800;letter-spacing:.04em}
+.mini svg{width:44px;height:44px;flex:0 0 auto}
+
+.eyebrow{font-size:14px;font-weight:800;letter-spacing:.12em;text-align:center;margin-top:30px}
+.title{font-size:clamp(34px,8vw,48px);line-height:1.04;font-weight:800;text-align:center;margin:10px 0 0;text-wrap:balance;
+  background:linear-gradient(90deg,var(--cyan),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(16px,3.6vw,19px);line-height:1.5;color:#C3D2DC;text-align:center;margin:16px auto 0;max-width:34em;text-wrap:balance}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
+.stat{background:rgba(10,28,39,.7);border:1px solid var(--line);border-radius:18px;padding:14px 6px;text-align:center}
+.stat b{display:block;font-size:26px;font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:#C3D2DC}
+
+.box{background:rgba(10,28,39,.72);border:1px solid var(--line);border-radius:22px;padding:20px;margin-top:16px}
+.box h3{margin:0 0 14px;font-size:14px;font-weight:800;letter-spacing:.06em}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.type{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px}
+.type .ic{font-size:26px;line-height:1}
+.type b{display:block;font-size:15px}
+.type span{font-size:12.5px;color:var(--muted)}
+
+.cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:20px;border:0;border-radius:18px;
+  background:linear-gradient(90deg,var(--cyan),var(--teal));color:var(--navy);font-weight:800;font-size:18px;letter-spacing:.12em;padding:19px 16px;text-decoration:none;transition:transform .15s, filter .15s}
+.cta:hover{filter:brightness(1.08)} .cta:active{transform:scale(.99)}
+.note{font-size:13px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+.src{font-size:12px;color:#6F8796;text-align:center;margin-top:18px;line-height:1.5}
+
+/* question */
+.qhead{border-bottom:1px solid var(--line);padding-bottom:18px;margin:0 calc(-1 * max(16px, env(safe-area-inset-left,0px)))}
+.qhead > div{padding-inline:max(16px, env(safe-area-inset-left,0px))}
+.qhead h1{font-size:clamp(26px,6vw,34px);font-weight:800;margin:0}
+.qhead p{margin:8px 0 0;color:#C3D2DC;font-size:15px;line-height:1.5}
+.card{background:rgba(5,14,20,.55);border:1px solid #102C3A;border-radius:24px;padding:22px 20px;margin-top:22px}
+.prog-row{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:8px;background:#0E2533;border-radius:99px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--teal));border-radius:99px;transition:width .3s}
+.q{font-size:clamp(19px,4.6vw,23px);line-height:1.3;font-weight:800;margin:22px 0 18px;text-wrap:balance}
+.q .e{margin-right:6px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:15px 18px;font-size:16px;line-height:1.35;font-weight:600;transition:border-color .15s, background .15s}
+.opt:hover{border-color:#2A6A78}
+.opt.sel{border-color:var(--teal);background:#0D2E35}
+.nav{display:flex;justify-content:space-between;margin-top:18px}
+.back{background:none;border:0;color:var(--muted);font-size:15px;font-weight:700;padding:8px 0}
+.back[disabled]{visibility:hidden}
+
+/* result */
+.res-type{font-size:72px;line-height:1;text-align:center;margin-top:24px}
+.score{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-top:14px;font-variant-numeric:tabular-nums}
+.score b{font-size:44px;font-weight:800;color:var(--teal)} .score span{color:var(--muted);font-weight:700}
+.scale{margin-top:22px}
+.scale .track{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#3B4FB8,#2A7FD0,#27C6B9,#9ED46A,#F6C35B)}
+.scale .pin{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;background:#fff;border:4px solid var(--navy);box-shadow:0 0 0 3px var(--teal);transform:translate(-50%,-50%)}
+.scale .lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:10px;font-weight:600}
+.list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.list li{display:flex;gap:12px;font-size:15px;line-height:1.5}
+.list li .e{font-size:19px;line-height:1.3;flex:0 0 22px}
+.club{border-color:rgba(39,224,198,.35);background:linear-gradient(160deg,rgba(13,46,53,.85),rgba(10,28,39,.85))}
+.club h3{font-size:20px;letter-spacing:0;line-height:1.25}
+.club p{font-size:15px;line-height:1.6;color:#D5E2EA;margin:0}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.feat div{background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.35;display:flex;gap:8px;align-items:flex-start}
+.feat .wide{grid-column:1/-1}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ghost{background:transparent;border:2px solid var(--line);border-radius:14px;padding:13px;font-weight:700;font-size:14.5px;color:var(--fg)}
+.ghost:hover{border-color:#2A6A78}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--teal);color:var(--navy);font-weight:800;padding:12px 18px;border-radius:12px;font-size:14px}
+
+@media (max-width:460px){
+  .types,.feat{grid-template-columns:1fr}
+  .stat b{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F3C74"/><stop offset="1" stop-color="#168E8A"/></linearGradient>
+    <symbol id="logo" viewBox="0 0 100 100">
+      <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#lg)" stroke="#13204A" stroke-width="1.2"/>
+      <path d="M21 50 L43 72 L74 34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="74" cy="34" r="7.5" fill="#5BFFE0" stroke="#13204A" stroke-width="1.6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===== НАСТРОЙКИ ===== */
+// Когда появится ссылка на оплату/бота, вставь её в кавычки:
+const JOIN_URL = "";
+
+/* ===== ВОПРОСЫ =====
+   19 вопросов опросника Хорна-Остберга (Morningness-Eveningness Questionnaire, 1976).
+   Баллы по оригинальной методике, сумма 16–86. */
+const Q = [
+ {e:"🛌", t:"Представь: завтра полностью свободный день. Во сколько ты бы встал(а), если бы планировал(а) его сам(а)?",
+  o:[["5:00 – 6:30",5],["6:30 – 7:45",4],["7:45 – 9:45",3],["9:45 – 11:00",2],["11:00 – 12:00",1]]},
+ {e:"🌙", t:"А во сколько ты бы лёг (легла) спать, если бы вечер был полностью свободен?",
+  o:[["20:00 – 21:00",5],["21:00 – 22:15",4],["22:15 – 00:30",3],["00:30 – 01:45",2],["01:45 – 03:00",1]]},
+ {e:"⏰", t:"Если утром нужно встать к определённому времени, насколько ты зависишь от будильника?",
+  o:[["Совсем не завишу",4],["Немного завишу",3],["Довольно сильно",2],["Без него никак",1]]},
+ {e:"🌅", t:"Насколько легко тебе вставать по утрам, если тебя не будят неожиданно?",
+  o:[["Очень тяжело",1],["Скорее тяжело",2],["Скорее легко",3],["Очень легко",4]]},
+ {e:"⚡", t:"Насколько ты бодр(а) в первые полчаса после пробуждения?",
+  o:[["Совсем не бодр(а)",1],["Чуть-чуть",2],["Довольно бодр(а)",3],["Полон (полна) сил",4]]},
+ {e:"🍳", t:"Какой у тебя аппетит в первые полчаса после пробуждения?",
+  o:[["Есть совсем не хочется",1],["Слабый",2],["Неплохой",3],["Отличный, готов(а) завтракать",4]]},
+ {e:"😴", t:"Как ты обычно чувствуешь себя в первые полчаса после пробуждения?",
+  o:[["Очень уставшим(ей)",1],["Скорее уставшим(ей)",2],["Скорее отдохнувшим(ей)",3],["Полностью отдохнувшим(ей)",4]]},
+ {e:"🗓️", t:"Если завтра никаких дел, во сколько ты ляжешь спать по сравнению с обычным временем?",
+  o:[["Почти никогда не позже",4],["Меньше чем на час позже",3],["На 1–2 часа позже",2],["Больше чем на 2 часа позже",1]]},
+ {e:"🏃", t:"Ты решил(а) заняться спортом. Друг предлагает тренироваться 2 раза в неделю с 7:00 до 8:00 утра. Как тебе такое время?",
+  o:[["Буду в отличной форме",4],["Буду в неплохой форме",3],["Будет тяжеловато",2],["Будет очень тяжело",1]]},
+ {e:"🥱", t:"Примерно во сколько вечером ты начинаешь уставать и хотеть спать?",
+  o:[["20:00 – 21:00",5],["21:00 – 22:15",4],["22:15 – 00:45",3],["00:45 – 02:00",2],["02:00 – 03:00",1]]},
+ {e:"🧠", t:"Тебя ждёт двухчасовой тест, который выжмет из головы максимум. Ты сам(а) выбираешь время. Когда?",
+  o:[["8:00 – 10:00",6],["11:00 – 13:00",4],["15:00 – 17:00",2],["19:00 – 21:00",0]]},
+ {e:"🕚", t:"Если ты ляжешь в 23:00, насколько уставшим(ей) ты будешь к этому времени?",
+  o:[["Совсем не устану",0],["Немного устану",2],["Довольно устану",3],["Буду валиться с ног",5]]},
+ {e:"🔄", t:"Ты лёг (легла) на несколько часов позже обычного, но утром никуда не надо. Что скорее всего будет?",
+  o:[["Проснусь в обычное время и больше не усну",4],["Проснусь в обычное время и буду дремать",3],["Проснусь в обычное время, но снова усну",2],["Проснусь позже обычного",1]]},
+ {e:"🌃", t:"Однажды ночью нужно не спать с 4:00 до 6:00, например, дежурство. Наутро никаких дел. Как поступишь?",
+  o:[["Не лягу, пока не закончу",1],["Подремлю до, а потом высплюсь",2],["Хорошо высплюсь до, а потом подремлю",3],["Высплюсь до, а после спать не буду",4]]},
+ {e:"💪", t:"Предстоит 2 часа тяжёлой физической работы. Время выбираешь ты. Когда?",
+  o:[["8:00 – 10:00",4],["11:00 – 13:00",3],["15:00 – 17:00",2],["19:00 – 21:00",1]]},
+ {e:"🏋️", t:"Друг зовёт на тяжёлые тренировки 2 раза в неделю с 22:00 до 23:00. Как тебе?",
+  o:[["Буду в отличной форме",1],["Буду в неплохой форме",2],["Будет тяжеловато",3],["Будет очень тяжело",4]]},
+ {e:"💼", t:"Ты сам(а) выбираешь рабочие часы: 5 часов подряд, работа интересная, платят за результат. Когда начнёшь?",
+  o:[["Между 4:00 и 8:00",5],["Между 8:00 и 9:00",4],["Между 9:00 и 14:00",3],["Между 14:00 и 17:00",2],["Между 17:00 и 4:00",1]]},
+ {e:"✨", t:"В какое время суток ты обычно чувствуешь себя лучше всего?",
+  o:[["5:00 – 8:00",5],["8:00 – 10:00",4],["10:00 – 17:00",3],["17:00 – 22:00",2],["22:00 – 5:00",1]]},
+ {e:"🦉", t:"Говорят, люди делятся на «жаворонков» и «сов». Кем ты себя считаешь?",
+  o:[["Точно жаворонок",6],["Скорее жаворонок",4],["Скорее сова",2],["Точно сова",0]]},
+];
+
+/* ===== РЕЗУЛЬТАТЫ ===== */
+const TYPES = [
+ {min:70,max:86,ic:"🐓",name:"Ярко выраженный жаворонок",short:"Утро — твоё суперсостояние",
+  about:"Ты просыпаешься легко и сразу включаешься в дела. Пик энергии и ясности у тебя в первой половине дня, а к вечеру силы заметно тают.",
+  tips:[["🧠","Самые сложные задачи ставь на утро, до обеда. Это твои золотые часы."],["🏃","Тренировки утром или днём зайдут лучше, чем поздно вечером."],["🌙","Поздние встречи и вечеринки сбивают тебе режим сильнее, чем другим. Береги вечер."],["🔁","Не отсыпайся до обеда в выходные: держи подъём примерно в одно время."]]},
+ {min:59,max:69,ic:"🌤️",name:"Умеренный жаворонок",short:"Скорее утренний человек",
+  about:"Утро даётся тебе неплохо, и первая половина дня обычно самая продуктивная. Но при желании можешь подстроиться и под более поздний график.",
+  tips:[["🧠","Ставь важные дела на утро и первую половину дня."],["☀️","Утренний свет и ранний завтрак помогут держать ритм."],["🔁","Старайся не сдвигать подъём в выходные больше чем на час."],["📵","Вечером не засиживайся в телефоне: тебе легко сбиться с ритма в «совиную» сторону."]]},
+ {min:42,max:58,ic:"🕊️",name:"Голубь: промежуточный тип",short:"Самый частый и гибкий хронотип",
+  about:"Ты ни ярко выраженный жаворонок, ни сова. Это самый распространённый тип. Пик продуктивности обычно приходится на позднее утро и день, и ты легче других подстраиваешься под график.",
+  tips:[["🧠","Сложные задачи лучше всего идут с позднего утра до середины дня."],["⏰","Твоя гибкость легко превращается в хаос: выбери одно время подъёма и держись его."],["☕","Последний кофе лучше пить не позже 14:00–15:00."],["🌙","За 30–60 минут до сна приглушай свет и откладывай телефон."]]},
+ {min:31,max:41,ic:"🌙",name:"Умеренная сова",short:"Скорее вечерний человек",
+  about:"Раскачиваешься ты не сразу, а лучше всего соображаешь во второй половине дня и вечером. Ранние подъёмы даются тяжело, и это не лень, а особенность ритма.",
+  tips:[["☀️","Сразу после подъёма лови дневной свет: шторы, балкон, прогулка. Это сдвигает часы раньше."],["🧠","Если можешь, ставь сложное на день и ранний вечер, а не на 8 утра."],["📵","Телефон «паркуй» вне кровати за 30 минут до сна, иначе вечер растянется до ночи."],["🔁","В выходные не отсыпайся до обеда: так понедельник будет легче."]]},
+ {min:16,max:30,ic:"🦉",name:"Ярко выраженная сова",short:"Ночь — твоё время",
+  about:"Утро для тебя испытание, а голова по-настоящему включается вечером и ночью. Тело живёт по своим часам, и если жить против них, накапливается недосып.",
+  tips:[["☀️","Яркий свет утром — твой главный инструмент. Выйди на улицу хотя бы на 10 минут."],["🌆","Вечером, наоборот, приглушай свет и убирай экраны: яркий свет поздно сдвигает часы ещё дальше."],["⏰","Сдвигай отбой постепенно, по 15–20 минут, а не на 2 часа за раз."],["🩺","Если график учёбы или работы никак не совпадает с ритмом и ты постоянно недосыпаешь, обсуди это с врачом-сомнологом."]]},
+];
+
+/* ===== ЛОГИКА ===== */
+const app = document.getElementById('app');
+let ans = new Array(Q.length).fill(null);
+let i = 0;
+const logo = (cls) => `<svg class="${cls}" aria-hidden="true"><use href="#logo"/></svg>`;
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const em = s => s.replace(/(\p{Extended_Pictographic}(️|‍\p{Extended_Pictographic})*)/gu,'<span class="e">$1</span>');
+
+function start(){
+  app.innerHTML = `
+  <div class="brand">${logo('logo')}<b>Челленджология</b><span>Ежедневные полезные привычки</span></div>
+  <div class="eyebrow">ТЕСТ НА ХРОНОТИП</div>
+  <h1 class="title">СОВА ИЛИ ЖАВОРОНОК?</h1>
+  <p class="lead">Узнай свой природный ритм и в какие часы тебе легче всего думать, тренироваться и засыпать.</p>
+  <div class="stats">
+    <div class="stat"><b>19</b><span>вопросов</span></div>
+    <div class="stat"><b>~3</b><span>минуты</span></div>
+    <div class="stat"><b>5</b><span>типов</span></div>
+  </div>
+  <div class="box">
+    <h3>КАКИМ ТЫ МОЖЕШЬ ОКАЗАТЬСЯ:</h3>
+    <div class="types">
+      <div class="type"><span class="ic e">🐓</span><div><b>Жаворонок</b><span>Пик энергии утром</span></div></div>
+      <div class="type"><span class="ic e">🌤️</span><div><b>Умеренный жаворонок</b><span>Скорее утренний</span></div></div>
+      <div class="type"><span class="ic e">🕊️</span><div><b>Голубь</b><span>Гибкий, дневной ритм</span></div></div>
+      <div class="type"><span class="ic e">🌙</span><div><b>Умеренная сова</b><span>Скорее вечерний</span></div></div>
+      <div class="type" style="grid-column:1/-1"><span class="ic e">🦉</span><div><b>Сова</b><span>Голова включается вечером и ночью</span></div></div>
+    </div>
+  </div>
+  <button class="cta" id="go">НАЧАТЬ ТЕСТ <span aria-hidden="true">→</span></button>
+  <p class="note">Отвечай так, как тебе комфортно, а не как приходится жить по графику. Опирайся на последние несколько недель. Бесплатно.</p>
+  <p class="src">Основано на опроснике Хорна-Остберга (J. Horne, O. Östberg, 1976). Это самый известный в мире тест на хронотип. Результат помогает понять себя, но не является медицинским диагнозом.</p>`;
+  document.getElementById('go').onclick = () => { i = 0; question(); };
+  scrollTo(0,0);
+}
+
+function question(){
+  const q = Q[i];
+  app.innerHTML = `
+  <div class="qhead"><div>
+    <div class="mini"><div class="t"><b>ЧЕЛЛЕНДЖОЛОГИЯ</b> · тест на хронотип</div>${logo('')}</div>
+    <h1>СОВА ИЛИ ЖАВОРОНОК? <span class="e">✨</span></h1>
+    <p>Выбирай вариант, который лучше всего описывает тебя в последние несколько недель.</p>
+  </div></div>
+  <div class="card">
+    <div class="prog-row"><span>Вопрос ${i+1}</span><span>${i+1} / ${Q.length}</span></div>
+    <div class="bar"><i style="width:${(i)/Q.length*100}%"></i></div>
+    <div class="q"><span class="e">${q.e}</span>${esc(q.t)}</div>
+    <div class="opts">${q.o.map((o,k)=>`<button class="opt${ans[i]===k?' sel':''}" data-k="${k}">${esc(o[0])}</button>`).join('')}</div>
+    <div class="nav"><button class="back" id="back" ${i===0?'disabled':''}>← Назад</button></div>
+  </div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    ans[i] = +b.dataset.k;
+    app.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+    app.querySelector('.bar i').style.width = ((i+1)/Q.length*100)+'%';
+    setTimeout(() => { if (i < Q.length-1){ i++; question(); } else result(); }, 220);
+  });
+  document.getElementById('back').onclick = () => { if (i>0){ i--; question(); } };
+  scrollTo(0,0);
+}
+
+function result(){
+  const score = ans.reduce((s,k,n)=> s + Q[n].o[k][1], 0);
+  const t = TYPES.find(x => score>=x.min && score<=x.max);
+  const pos = (score-16)/(86-16)*100;
+  app.innerHTML = `
+  <div class="mini"><div class="t"><b>ЧЕЛЛЕНДЖОЛОГИЯ</b> · твой результат</div>${logo('')}</div>
+  <div class="res-type e">${t.ic}</div>
+  <div class="eyebrow" style="margin-top:14px">ТВОЙ ХРОНОТИП</div>
+  <h1 class="title" style="font-size:clamp(28px,7vw,40px)">${t.name.toUpperCase()}</h1>
+  <p class="lead">${t.short}</p>
+  <div class="score"><b>${score}</b><span>баллов из 86</span></div>
+  <div class="scale" aria-label="Шкала от совы до жаворонка">
+    <div class="track"><span class="pin" style="left:${pos}%"></span></div>
+    <div class="lbls"><span>🦉 Сова</span><span>🕊️ Голубь</span><span>🐓 Жаворонок</span></div>
+  </div>
+
+  <div class="box"><h3><span class="e">🔍</span> ЧТО ЭТО ЗНАЧИТ</h3><p style="margin:0;font-size:15.5px;line-height:1.6;color:#D5E2EA">${t.about}</p></div>
+
+  <div class="box"><h3><span class="e">🎯</span> 4 СОВЕТА ДЛЯ ТВОЕГО ТИПА</h3>
+    <ul class="list">${t.tips.map(x=>`<li><span class="e">${x[0]}</span><span>${x[1]}</span></li>`).join('')}</ul>
+  </div>
+
+  <div class="box club">
+    <h3>Знать свой хронотип — полдела. <span class="e">🤝</span><br>Наладить режим проще вместе</h3>
+    <p><b style="color:var(--teal)">Челленджология</b> — сообщество, в котором ты каждую неделю вместе с единомышленниками превращаешь полезные знания в реальные действия через 7-дневные челленджи. Сам голосуешь за новые испытания, выбираешь, в каких участвовать, и постепенно создаёшь привычки, которые меняют твою жизнь.</p>
+    <div class="feat">
+      <div class="wide"><span class="e">🌙</span><span><b>3 сферы саморазвития:</b> сон, питание, физическая активность</span></div>
+      <div><span class="e">🔥</span><span><b>55 челленджей</b></span></div>
+      <div><span class="e">🎮</span><span><b>Игровой формат:</b> очки, статусы, уровни</span></div>
+      <div><span class="e">🎁</span><span><b>Бонусы и призы</b></span></div>
+      <div><span class="e">👥</span><span><b>Сильное окружение</b></span></div>
+    </div>
+    ${JOIN_URL ? `<a class="cta" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
+               : `<button class="cta" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
+  </div>
+
+  <div class="row2">
+    <button class="ghost" id="share"><span class="e">📤</span> Поделиться результатом</button>
+    <button class="ghost" id="again"><span class="e">🔁</span> Пройти заново</button>
+  </div>
+  <p class="src">Опросник Хорна-Остберга (Morningness-Eveningness Questionnaire), 1976. Шкала: 16–30 сова, 31–41 умеренная сова, 42–58 промежуточный тип, 59–69 умеренный жаворонок, 70–86 жаворонок. Тест не является медицинской диагностикой.</p>`;
+  document.getElementById('again').onclick = () => { ans = new Array(Q.length).fill(null); start(); };
+  const j = document.getElementById('join'); if (j) j.onclick = () => toast('Ссылка на вступление скоро появится 🙌');
+  document.getElementById('share').onclick = () => {
+    const txt = `Я прошёл(ла) тест на хронотип от Челленджологии: ${t.name} ${t.ic} (${score} из 86). А ты сова или жаворонок?`;
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast('Текст скопирован, отправь другу ✨')).catch(()=>toast(txt));
+    else toast(txt);
+  };
+  scrollTo(0,0);
+}
+
+let tt;
+function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.hidden=false; clearTimeout(tt); tt=setTimeout(()=>el.hidden=true,2600); }
+
+start();
+</script>
+</body>
+</html>
