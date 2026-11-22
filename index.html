@@ -174,7 +174,60 @@ img.lk{height:1.15em;width:auto;vertical-align:-0.22em;display:inline-block}
   .types,.feat{grid-template-columns:1fr}
   .stat b{font-size:22px}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== АНИМАЦИИ ===== */
+/* 1. Логотип рисуется сам */
+.logo-anim path{stroke-dasharray:84;stroke-dashoffset:84;animation:draw .9s .35s cubic-bezier(.6,0,.3,1) forwards}
+.logo-anim circle{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:pop .5s 1.15s cubic-bezier(.3,1.7,.5,1) forwards}
+.logo-anim rect{transform-box:fill-box;transform-origin:center;animation:logoIn .6s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes logoIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.rise{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* 3. Живой фон «день — ночь» */
+#sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#sky .glow{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+#sky .g1{width:60vmax;height:60vmax;left:-20vmax;top:-25vmax;background:radial-gradient(circle,rgba(0,120,150,.7),transparent 65%);animation:drift1 22s ease-in-out infinite alternate}
+#sky .g2{width:55vmax;height:55vmax;right:-20vmax;bottom:-25vmax;background:radial-gradient(circle,rgba(0,190,170,.55),transparent 65%);animation:drift2 26s ease-in-out infinite alternate}
+#sky .g3{width:40vmax;height:40vmax;left:-10vmax;bottom:-20vmax;background:radial-gradient(circle,rgba(20,60,140,.6),transparent 65%);animation:drift1 30s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate(8vmax,6vmax) scale(1.1)}}
+@keyframes drift2{to{transform:translate(-7vmax,-5vmax) scale(1.08)}}
+#sky .stars{position:absolute;inset:0;transition:opacity 1.2s}
+body:not(.home) #sky .stars{opacity:.25}
+#sky .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.15;animation:twinkle var(--d,4s) ease-in-out var(--dl,0s) infinite}
+#sky .star.b{width:3px;height:3px;box-shadow:0 0 6px rgba(160,255,240,.8)}
+@keyframes twinkle{0%,100%{opacity:.12}50%{opacity:var(--o,.8)}}
+
+/* 4. Переходы между вопросами и луна на прогрессе */
+.card.enter{animation:slideIn .35s cubic-bezier(.2,.8,.2,1) both}
+.card.enter.from-left{animation-name:slideInL}
+.card.leave{animation:slideOut .26s ease-in both}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes slideInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes slideOut{to{opacity:0;transform:translateX(-40px)}}
+.bar{position:relative;overflow:visible;margin-top:18px}
+.bar i{transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.bar-ic{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1;transition:left .45s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 8px rgba(39,224,198,.5))}
+.opt{transition:border-color .15s,background .15s,transform .12s}
+.opt:active{transform:scale(.98)}
+
+/* 1. Раскрытие результата */
+.res-type.pop{animation:resPop .7s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes resPop{0%{transform:scale(0) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
+.scale .pin{transition:left 1.4s cubic-bezier(.25,.9,.25,1)}
+.legend div.me.reveal{animation:meGlow 1s ease both}
+@keyframes meGlow{0%{box-shadow:0 0 0 0 rgba(39,224,198,.6)}60%{box-shadow:0 0 0 10px rgba(39,224,198,0)}100%{box-shadow:none}}
+
+/* 5. Блик на кнопке */
+.cta{position:relative;overflow:hidden}
+.cta.shine::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:shine 4.5s ease-in-out 1.5s infinite}
+@keyframes shine{0%{left:-60%}22%{left:130%}100%{left:130%}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .logo-anim path{stroke-dashoffset:0}.logo-anim circle{transform:none}
+}
 </style>
 </head>
 <body>
@@ -190,6 +243,7 @@ img.lk{height:1.15em;width:auto;vertical-align:-0.22em;display:inline-block}
   </defs>
 </svg>
 
+<div id="sky" aria-hidden="true"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div><div class="stars" id="stars"></div></div>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
 <div class="lightbox" id="lightbox" hidden>
@@ -292,14 +346,33 @@ let ans = new Array(Q.length).fill(null);
 let i = 0;
 const logo = (cls) => `<svg class="${cls}" aria-hidden="true"><use href="#logo"/></svg>`;
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches; // «уменьшить движение» в телефоне
+let dir = 1; // направление перехода между вопросами
+
+/* Звёзды на фоне */
+(() => {
+  const box = document.getElementById('stars'); let html = '';
+  for (let n = 0; n < 60; n++) {
+    const big = Math.random() < .2;
+    html += `<i class="star${big?' b':''}" style="left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*70).toFixed(2)}%;--d:${(3+Math.random()*4).toFixed(1)}s;--dl:${(Math.random()*5).toFixed(1)}s;--o:${(.5+Math.random()*.5).toFixed(2)}"></i>`;
+  }
+  box.innerHTML = html;
+})();
+
+/* Анимированный логотип для стартового экрана */
+const logoAnim = `<svg class="logo logo-anim" viewBox="0 0 100 100" aria-hidden="true">
+  <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#lg)" stroke="#13204A" stroke-width="1.2"/>
+  <path d="M21 50 L43 72 L74 34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="74" cy="34" r="7.5" fill="#5BFFE0" stroke="#13204A" stroke-width="1.6"/></svg>`;
 
 function start(){
+  document.body.classList.add('home');
   app.innerHTML = `
-  <div class="brand">${logo('logo')}<b>Челленджология</b><span>Ежедневные полезные привычки</span></div>
-  <div class="eyebrow">ТЕСТ НА ХРОНОТИП</div>
-  <h1 class="title">СОВА ИЛИ ЖАВОРОНОК?</h1>
-  <p class="lead">Узнай свой природный ритм и в какие часы тебе легче всего думать, тренироваться и засыпать.</p>
-  <div class="stats">
+  <div class="brand">${logoAnim}<b class="rise" style="animation-delay:.5s">Челленджология</b><span class="rise" style="animation-delay:.6s">Ежедневные полезные привычки</span></div>
+  <div class="eyebrow rise" style="animation-delay:.8s">ТЕСТ НА ХРОНОТИП</div>
+  <h1 class="title rise" style="animation-delay:.9s">СОВА ИЛИ ЖАВОРОНОК?</h1>
+  <p class="lead rise" style="animation-delay:1.05s">Узнай свой природный ритм и в какие часы тебе легче всего думать, тренироваться и засыпать.</p>
+  <div class="stats rise" style="animation-delay:1.2s">
     <div class="stat"><b>19</b><span>вопросов</span></div>
     <div class="stat"><b>~3</b><span>минуты</span></div>
     <div class="stat"><b>5</b><span>типов</span></div>
@@ -314,24 +387,27 @@ function start(){
       <div class="type" style="grid-column:1/-1"><span class="ic e">🦉</span><div><b>Сова</b><span>Голова включается вечером и ночью</span></div></div>
     </div>
   </div>
-  <button class="cta" id="go">НАЧАТЬ ТЕСТ <span aria-hidden="true">→</span></button>
+  <button class="cta rise" id="go" style="animation-delay:1.35s">НАЧАТЬ ТЕСТ <span aria-hidden="true">→</span></button>
   <p class="note">Отвечай так, как тебе комфортно, а не как приходится жить по графику. Опирайся на последние несколько недель. Бесплатно.</p>
   <p class="src">Основано на опроснике Хорна-Остберга (J. Horne, O. Östberg, 1976). Это самый известный в мире тест на хронотип. Результат помогает понять себя, но не является медицинским диагнозом.</p>`;
-  document.getElementById('go').onclick = () => { i = 0; question(); };
+  document.getElementById('go').onclick = () => { i = 0; dir = 1; question(); };
   scrollTo(0,0);
 }
 
+const barIc = p => p < 40 ? '🌙' : p < 80 ? '🌅' : '☀️'; // луна по пути превращается в солнце
 function question(){
+  document.body.classList.remove('home');
   const q = Q[i];
+  const p0 = i/Q.length*100;
   app.innerHTML = `
   <div class="qhead"><div>
     <div class="mini"><div class="t"><b>ЧЕЛЛЕНДЖОЛОГИЯ</b> · тест на хронотип</div>${logo('')}</div>
     <h1>СОВА ИЛИ ЖАВОРОНОК? <span class="e">✨</span></h1>
     <p>Выбирай вариант, который лучше всего описывает тебя в последние несколько недель.</p>
   </div></div>
-  <div class="card">
+  <div class="card enter${dir<0?' from-left':''}">
     <div class="prog-row"><span>Вопрос ${i+1}</span><span>${i+1} / ${Q.length}</span></div>
-    <div class="bar"><i style="width:${(i)/Q.length*100}%"></i></div>
+    <div class="bar"><i style="width:${p0}%"></i><span class="bar-ic e" style="left:${p0}%">${barIc(p0)}</span></div>
     <div class="q"><span class="e">${q.e}</span>${esc(q.t)}</div>
     <div class="opts">${q.o.map((o,k)=>`<button class="opt${ans[i]===k?' sel':''}" data-k="${k}">${esc(o[0])}</button>`).join('')}</div>
     <div class="nav"><button class="back" id="back" ${i===0?'disabled':''}>← Назад</button></div>
@@ -342,10 +418,13 @@ function question(){
     locked = true;
     ans[i] = +b.dataset.k;
     app.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
-    app.querySelector('.bar i').style.width = ((i+1)/Q.length*100)+'%';
-    setTimeout(() => { if (i < Q.length-1){ i++; question(); } else result(); }, 220);
+    const p1 = (i+1)/Q.length*100;
+    app.querySelector('.bar i').style.width = p1+'%';
+    const ic = app.querySelector('.bar-ic'); ic.style.left = p1+'%'; ic.textContent = barIc(p1);
+    setTimeout(() => { if (!RM) app.querySelector('.card').classList.add('leave'); }, 200);
+    setTimeout(() => { dir = 1; if (i < Q.length-1){ i++; question(); } else result(); }, RM ? 220 : 460);
   });
-  document.getElementById('back').onclick = () => { if (i>0){ i--; question(); } };
+  document.getElementById('back').onclick = () => { if (i>0){ i--; dir = -1; question(); } };
   scrollTo(0,0);
 }
 
@@ -357,13 +436,13 @@ function result(){
   const pos = (score-16)/(86-16)*100;
   app.innerHTML = `
   <div class="mini"><div class="t"><b>ЧЕЛЛЕНДЖОЛОГИЯ</b> · твой результат</div>${logo('')}</div>
-  <div class="res-type e">${icon(t)}</div>
-  <div class="eyebrow" style="margin-top:14px">ТВОЙ ХРОНОТИП</div>
-  <h1 class="title" style="font-size:clamp(28px,7vw,40px)">${t.name.toUpperCase()}</h1>
-  <p class="lead">${t.short}</p>
-  <div class="score"><b>${score}</b><span>баллов из 86</span></div>
+  <div class="res-type e pop" style="animation-delay:.15s">${icon(t)}</div>
+  <div class="eyebrow rise" style="margin-top:14px;animation-delay:.45s">ТВОЙ ХРОНОТИП</div>
+  <h1 class="title rise" style="font-size:clamp(28px,7vw,40px);animation-delay:.55s">${t.name.toUpperCase()}</h1>
+  <p class="lead rise" style="animation-delay:.65s">${t.short}</p>
+  <div class="score rise" style="animation-delay:.75s"><b id="score-num">${RM ? score : 0}</b><span>баллов из 86</span></div>
   <div class="scale" aria-label="Шкала от совы до жаворонка">
-    <div class="track"><span class="pin" style="left:${pos}%"></span></div>
+    <div class="track"><span class="pin" id="pin" style="left:${RM ? pos : 0}%"></span></div>
     <div class="lbls"><span>🦉 Сова</span><span>🕊️ Голубь</span><span>${LARK} Жаворонок</span></div>
   </div>
   <div class="legend">
@@ -414,8 +493,8 @@ function result(){
       <li><span class="e">4️⃣</span><span>Начинай системно менять себя вместе с людьми, которые тоже хотят стать лучше</span></li>
       <li><span class="e">5️⃣</span><span>Получай бонусы и призы за регулярность и саморазвитие</span></li>
     </ol>
-    ${JOIN_URL ? `<a class="cta" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
-               : `<button class="cta" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
+    ${JOIN_URL ? `<a class="cta shine" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
+               : `<button class="cta shine" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
     <p class="note">Откроется Телеграм-бот: там подробно о клубе, стоимость и оплата</p>
   </div>
 
@@ -426,6 +505,7 @@ function result(){
   <p class="src">Опросник Хорна-Остберга (Morningness-Eveningness Questionnaire), 1976. Тест не является медицинской диагностикой.</p>`;
   document.getElementById('again').onclick = () => { ans = new Array(Q.length).fill(null); start(); };
   initCarousel();
+  revealResult(score, pos);
   const j = document.getElementById('join'); if (j) j.onclick = () => toast('Ссылка на вступление скоро появится 🙌');
   document.getElementById('share').onclick = () => {
     const url = 'https://challengology.github.io/chronotype-test/';
@@ -436,6 +516,21 @@ function result(){
     else openShare(txt, url);
   };
   scrollTo(0,0);
+}
+
+/* Раскрытие результата: баллы считаются, отметка едет по шкале, тип подсвечивается */
+function revealResult(score, pos){
+  if (RM) return;
+  const num = document.getElementById('score-num'), pin = document.getElementById('pin');
+  const t0 = performance.now() + 750, dur = 1400;
+  const tick = now => {
+    const k = Math.min(1, Math.max(0, (now - t0) / dur));
+    num.textContent = Math.round(score * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  setTimeout(() => { pin.style.left = pos + '%'; }, 750);
+  setTimeout(() => { const me = document.querySelector('.legend .me'); if (me) me.classList.add('reveal'); }, 2150);
 }
 
 /* ===== КАРУСЕЛЬ «Загляни внутрь клуба» =====
