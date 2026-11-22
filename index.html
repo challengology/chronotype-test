@@ -135,6 +135,19 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .ghost{background:transparent;border:2px solid var(--line);border-radius:14px;padding:13px;font-weight:700;font-size:14.5px;color:var(--fg)}
 .ghost:hover{border-color:#2A6A78}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(1,6,10,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal[hidden]{display:none}
+.sheet{position:relative;width:100%;max-width:460px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px 20px 20px}
+.sheet h3{margin:0;font-size:20px;font-weight:800;padding-right:36px}
+.sheet p{margin:6px 0 16px;color:var(--muted);font-size:14px;line-height:1.45}
+.sheet .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:15px}
+.sh-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sh{display:block;text-align:center;text-decoration:none;font-weight:800;font-size:14px;padding:13px 6px;border-radius:12px;color:#fff}
+.sh.tg{background:#229ED9}.sh.wa{background:#25A35A}.sh.vk{background:#0077FF}
+.sh:hover{filter:brightness(1.1)}
+.sheet label{display:block;margin:18px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.sheet textarea{width:100%;resize:none;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:12px;font:500 14px/1.5 var(--f-body),var(--f-emoji)}
+@media (max-width:380px){.sh-row{grid-template-columns:1fr}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--teal);color:var(--navy);font-weight:800;padding:12px 18px;border-radius:12px;font-size:14px}
 
 @media (max-width:460px){
@@ -159,6 +172,21 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
+<div class="modal" id="share-modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+    <button class="x" id="sh-close" aria-label="Закрыть">✕</button>
+    <h3 id="sh-title">Поделиться результатом <span class="e">📤</span></h3>
+    <p>Отправь другу, пусть тоже узнает, сова он или жаворонок</p>
+    <div class="sh-row">
+      <a id="sh-tg" class="sh tg" target="_blank" rel="noopener">Телеграм</a>
+      <a id="sh-wa" class="sh wa" target="_blank" rel="noopener">WhatsApp</a>
+      <a id="sh-vk" class="sh vk" target="_blank" rel="noopener">ВКонтакте</a>
+    </div>
+    <label for="share-text">Или скопируй текст:</label>
+    <textarea id="share-text" readonly rows="4"></textarea>
+    <button class="cta" id="sh-copy" style="font-size:15px;letter-spacing:.04em;padding:15px;margin-top:12px">Скопировать текст и ссылку</button>
+  </div>
+</div>
 
 <script>
 /* ===== НАСТРОЙКИ ===== */
@@ -361,17 +389,37 @@ function result(){
   document.getElementById('share').onclick = () => {
     const url = 'https://challengology.github.io/chronotype-test/';
     const txt = `Я прошёл(ла) тест на хронотип от Челленджологии: ${t.name} ${t.ic} (${score} из 86). А ты сова или жаворонок? Пройди за 3 минуты 👇`;
-    const copy = () => {
-      const full = `${txt}\n${url}`;
-      if (navigator.clipboard) navigator.clipboard.writeText(full).then(()=>toast('Ссылка и текст скопированы, отправь другу ✨')).catch(()=>toast(full));
-      else toast(full);
-    };
-    // На телефоне откроется родное меню «Поделиться» (Телеграм, WhatsApp и т.д.), на компьютере текст копируется
-    if (navigator.share) navigator.share({ title:'Сова или жаворонок?', text:txt, url }).catch(e => { if (e && e.name !== 'AbortError') copy(); });
-    else copy();
+    // На телефоне — родное меню «Поделиться». На компьютере — окно с кнопками мессенджеров и копированием
+    const isPhone = matchMedia('(pointer:coarse)').matches;
+    if (isPhone && navigator.share) navigator.share({ title:'Сова или жаворонок?', text:txt, url }).catch(e => { if (e && e.name !== 'AbortError') openShare(txt, url); });
+    else openShare(txt, url);
   };
   scrollTo(0,0);
 }
+
+/* Окно «Поделиться результатом» */
+function openShare(txt, url){
+  const full = `${txt}\n${url}`;
+  const m = document.getElementById('share-modal');
+  const ta = document.getElementById('share-text');
+  ta.value = full;
+  const enc = encodeURIComponent;
+  document.getElementById('sh-tg').href = `https://t.me/share/url?url=${enc(url)}&text=${enc(txt)}`;
+  document.getElementById('sh-wa').href = `https://wa.me/?text=${enc(full)}`;
+  document.getElementById('sh-vk').href = `https://vk.com/share.php?url=${enc(url)}&title=${enc(txt)}`;
+  const btn = document.getElementById('sh-copy');
+  btn.textContent = 'Скопировать текст и ссылку';
+  btn.onclick = () => {
+    const done = () => { btn.textContent = 'Скопировано ✓'; };
+    const fallback = () => { ta.focus(); ta.select(); try { document.execCommand('copy'); done(); } catch(e) { btn.textContent = 'Выдели текст выше и нажми Ctrl+C'; } };
+    if (navigator.clipboard) navigator.clipboard.writeText(full).then(done).catch(fallback); else fallback();
+  };
+  m.hidden = false;
+  ta.scrollTop = 0;
+}
+function closeShare(){ document.getElementById('share-modal').hidden = true; }
+document.getElementById('share-modal').addEventListener('click', e => { if (e.target.id === 'share-modal' || e.target.closest('#sh-close')) closeShare(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeShare(); });
 
 let tt;
 function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.hidden=false; clearTimeout(tt); tt=setTimeout(()=>el.hidden=true,2600); }
