@@ -222,7 +222,6 @@ let ans = new Array(Q.length).fill(null);
 let i = 0;
 const logo = (cls) => `<svg class="${cls}" aria-hidden="true"><use href="#logo"/></svg>`;
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const em = s => s.replace(/(\p{Extended_Pictographic}(️|‍\p{Extended_Pictographic})*)/gu,'<span class="e">$1</span>');
 
 function start(){
   app.innerHTML = `
@@ -267,7 +266,10 @@ function question(){
     <div class="opts">${q.o.map((o,k)=>`<button class="opt${ans[i]===k?' sel':''}" data-k="${k}">${esc(o[0])}</button>`).join('')}</div>
     <div class="nav"><button class="back" id="back" ${i===0?'disabled':''}>← Назад</button></div>
   </div>`;
+  let locked = false; // защита от двойного нажатия: один ответ = один переход
   app.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    if (locked) return;
+    locked = true;
     ans[i] = +b.dataset.k;
     app.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
     app.querySelector('.bar i').style.width = ((i+1)/Q.length*100)+'%';
@@ -278,6 +280,8 @@ function question(){
 }
 
 function result(){
+  const miss = ans.findIndex(a => a === null);
+  if (miss !== -1) { i = miss; question(); return; }
   const score = ans.reduce((s,k,n)=> s + Q[n].o[k][1], 0);
   const t = TYPES.find(x => score>=x.min && score<=x.max);
   const pos = (score-16)/(86-16)*100;
