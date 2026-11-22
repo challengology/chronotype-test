@@ -4,8 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Сова или жаворонок</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Тест на хронотип Хорна-Остберга от Челленджологии: узнай, сова ты или жаворонок, за 3 минуты.">
+<!-- Превью ссылки в Телеграме, ВКонтакте и мессенджерах -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Челленджология">
+<meta property="og:url" content="https://challengology.github.io/chronotype-test/">
+<meta property="og:title" content="Сова или жаворонок? Тест на хронотип">
+<meta property="og:description" content="Узнай свой природный ритм за 3 минуты: когда тебе легче думать, тренироваться и засыпать. Бесплатно.">
+<meta property="og:image" content="https://challengology.github.io/chronotype-test/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://challengology.github.io/chronotype-test/og.png">
+<meta name="theme-color" content="#03080C">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap">
 <style>
 /* Layout: одна колонка до 640px, один экран = один шаг (старт → вопрос → результат), как в «Колесе привычек» */
@@ -347,9 +359,16 @@ function result(){
   document.getElementById('again').onclick = () => { ans = new Array(Q.length).fill(null); start(); };
   const j = document.getElementById('join'); if (j) j.onclick = () => toast('Ссылка на вступление скоро появится 🙌');
   document.getElementById('share').onclick = () => {
-    const txt = `Я прошёл(ла) тест на хронотип от Челленджологии: ${t.name} ${t.ic} (${score} из 86). А ты сова или жаворонок?`;
-    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast('Текст скопирован, отправь другу ✨')).catch(()=>toast(txt));
-    else toast(txt);
+    const url = 'https://challengology.github.io/chronotype-test/';
+    const txt = `Я прошёл(ла) тест на хронотип от Челленджологии: ${t.name} ${t.ic} (${score} из 86). А ты сова или жаворонок? Пройди за 3 минуты 👇`;
+    const copy = () => {
+      const full = `${txt}\n${url}`;
+      if (navigator.clipboard) navigator.clipboard.writeText(full).then(()=>toast('Ссылка и текст скопированы, отправь другу ✨')).catch(()=>toast(full));
+      else toast(full);
+    };
+    // На телефоне откроется родное меню «Поделиться» (Телеграм, WhatsApp и т.д.), на компьютере текст копируется
+    if (navigator.share) navigator.share({ title:'Сова или жаворонок?', text:txt, url }).catch(e => { if (e && e.name !== 'AbortError') copy(); });
+    else copy();
   };
   scrollTo(0,0);
 }
