@@ -125,7 +125,9 @@ img.lk{height:1.15em;width:auto;vertical-align:-0.22em;display:inline-block}
 .car-slide img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;background:#0B202D}
 .car-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(3,8,12,.75);color:var(--fg);font-size:26px;line-height:1;display:none}
 .car-nav.prev{left:-8px}.car-nav.next{right:-8px}
-@media (hover:hover) and (pointer:fine){.car-nav{display:block}}
+.car-nav{display:block}
+.car-track{cursor:grab}.car-track.grab{cursor:grabbing;scroll-snap-type:none}
+.car-track.grab .car-slide{pointer-events:none}
 .car-dots{display:flex;justify-content:center;gap:7px;margin-top:6px}
 .car-dots i{width:8px;height:8px;border-radius:99px;background:#24485A;cursor:pointer;transition:width .2s,background .2s}
 .car-dots i.on{width:22px;background:var(--teal)}
@@ -238,6 +240,28 @@ body:not(.home) #sky .stars{opacity:.25}
 .stat b{font-family:var(--f-display);font-size:24px}
 .score b,.score-ring .num b{font-family:var(--f-display);font-size:40px}
 @media (max-width:460px){.stat b{font-size:20px}}
+/* крупнее и живее тексты в результате и в блоке клуба */
+.club h3{font-size:22px}
+.club p{font-size:16.5px;line-height:1.6;color:#E4EEF3}
+.author{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(30,200,232,.14),rgba(39,224,198,.08));border:1px solid rgba(39,224,198,.35)}
+.author .e{font-size:28px;line-height:1}
+.author p{font-size:16.5px;line-height:1.55;color:#fff}
+.author b{color:var(--teal)}
+.for-head{margin-top:18px!important;font-size:17px!important;font-weight:800;color:#fff!important}
+.for{gap:12px}
+.for li{font-size:16.5px;line-height:1.5;color:#F2F7FA}
+.promise{font-size:19px;padding:18px 18px}
+.feat{gap:10px;margin-top:18px}
+.feat div{font-size:15.5px;line-height:1.4;padding:14px 14px;color:#F2F7FA;background:rgba(39,224,198,.08);border:1px solid rgba(39,224,198,.22);border-radius:14px}
+.feat div .e{font-size:20px}
+.feat b{color:#fff}
+.path li{font-size:16.5px;line-height:1.5;color:#F2F7FA;padding:11px 0}
+.list li{font-size:16px;line-height:1.55;color:#F2F7FA}
+.note{font-size:14.5px;color:#B8CAD5}
+.car-hint{font-size:14px;color:#B8CAD5}
+.mind{font-size:14px;color:#B8CAD5}
+.src{font-size:13px;color:#8FA6B5}
+@media (max-width:460px){.feat div{font-size:15px}}
 </style>
 </head>
 <body>
@@ -464,48 +488,7 @@ function result(){
     <ul class="list">${t.tips.map(x=>`<li><span class="e">${x[0]}</span><span>${x[1]}</span></li>`).join('')}</ul>
   </div>
 
-  <div class="box club">
-    <h3>Знать свой хронотип — полдела <span class="e">🤝</span></h3>
-    <p>Главное — что ты с этим сделаешь. Сон, энергия и привычки меняются не от знаний, а от ежедневных маленьких действий.</p>
-    <p style="margin-top:16px"><b style="color:var(--teal)">Челленджология</b> — для тех, кто:</p>
-    <ul class="for">
-      <li><span class="e">⏳</span><span>хочет развиваться, но постоянно откладывает или бросает;</span></li>
-      <li><span class="e">🧭</span><span>хочет изменить свою жизнь, но не знает, с чего начать;</span></li>
-      <li><span class="e">🫂</span><span>хочет развиваться, но устал делать это в одиночку;</span></li>
-      <li><span class="e">📉</span><span>уже работает над собой, но не хватает постоянства;</span></li>
-      <li><span class="e">🔋</span><span>устал от разовых марафонов и мотивации на пару дней.</span></li>
-    </ul>
-    <div class="arrow e">⬇️</div>
-    <div class="promise">Сформируй полезные привычки <span>в игровом формате</span> с помощью 7-дневных челленджей в окружении единомышленников</div>
-    <div class="feat">
-      <div class="wide"><span class="e">🌙</span><span><b>3 сферы саморазвития:</b> сон, питание, физическая активность</span></div>
-      <div><span class="e">🔥</span><span><b>55 челленджей</b></span></div>
-      <div><span class="e">🎮</span><span><b>Игровой формат:</b> очки, статусы, уровни</span></div>
-      <div><span class="e">🎁</span><span><b>Бонусы и призы</b></span></div>
-      <div><span class="e">👥</span><span><b>Сильное окружение</b></span></div>
-    </div>
-    <h3 style="margin-top:24px">Загляни внутрь клуба <span class="e">👀</span></h3>
-    <div class="car">
-      <div class="car-track" id="car-track">
-        ${SLIDES.map((s,n)=>`<button class="car-slide" data-n="${n}" aria-label="Открыть: ${s.alt}"><img src="img/${s.f}" alt="${s.alt}" width="1080" height="1350" ${n>1?'loading="lazy"':''}></button>`).join('')}
-      </div>
-      <button class="car-nav prev" id="car-prev" aria-label="Назад">‹</button>
-      <button class="car-nav next" id="car-next" aria-label="Вперёд">›</button>
-    </div>
-    <div class="car-dots" id="car-dots">${SLIDES.map((s,n)=>`<i class="${n?'':'on'}"></i>`).join('')}</div>
-    <p class="car-hint">Листай вбок, нажми, чтобы увеличить</p>
-    <h3 style="margin-top:22px">Хватит ждать подходящего момента <span class="e">⏰</span></h3>
-    <ol class="path">
-      <li><span class="e">1️⃣</span><span>Заходи в Челленджологию</span></li>
-      <li><span class="e">2️⃣</span><span>Определи свою цель</span></li>
-      <li><span class="e">3️⃣</span><span>Выбирай челлендж</span></li>
-      <li><span class="e">4️⃣</span><span>Начинай системно менять себя вместе с людьми, которые тоже хотят стать лучше</span></li>
-      <li><span class="e">5️⃣</span><span>Получай бонусы и призы за регулярность и саморазвитие</span></li>
-    </ol>
-    ${JOIN_URL ? `<a class="cta shine" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
-               : `<button class="cta shine" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
-    <p class="note">Откроется Телеграм-бот: там подробно о клубе, стоимость и оплата</p>
-  </div>
+  ${clubBlock("Знать свой хронотип — полдела", "🤝", "Главное — что ты с этим сделаешь. Сон, энергия и привычки меняются не от знаний, а от ежедневных маленьких действий. И это намного проще, когда рядом люди с той же целью.")}
 
   <div class="row2">
     <button class="ghost" id="share"><span class="e">📤</span> Поделиться результатом</button>
@@ -542,6 +525,54 @@ function revealResult(score, pos){
   setTimeout(() => { const me = document.querySelector('.legend .me'); if (me) me.classList.add('reveal'); }, 2150);
 }
 
+/* ===== БЛОК КЛУБА (общий для всех лид-магнитов, меняются только заголовок и фраза) ===== */
+function clubBlock(title, emoji, bridge){
+  return `
+  <div class="box club">
+    <h3>${title} <span class="e">${emoji}</span></h3>
+    <p>${bridge}</p>
+    <div class="author"><span class="e">👋</span><p>Именно поэтому я создал <b>«Челленджологию»</b> — сообщество, где полезные привычки формируются не в одиночку, а вместе с единомышленниками.</p></div>
+    <p class="for-head">Тебе сюда, если ты:</p>
+    <ul class="for">
+      <li><span class="e">⏳</span><span>хочешь развиваться, но постоянно откладываешь или бросаешь;</span></li>
+      <li><span class="e">🧭</span><span>хочешь изменить свою жизнь, но не знаешь, с чего начать;</span></li>
+      <li><span class="e">🫂</span><span>хочешь развиваться, но устал делать это в одиночку;</span></li>
+      <li><span class="e">📉</span><span>уже работаешь над собой, но не хватает постоянства;</span></li>
+      <li><span class="e">🔋</span><span>устал от разовых марафонов и мотивации на пару дней.</span></li>
+    </ul>
+    <div class="arrow e">⬇️</div>
+    <div class="promise">Сформируй полезные привычки <span>в игровом формате</span> с помощью 7-дневных челленджей в окружении единомышленников</div>
+    <div class="feat">
+      <div class="wide"><span class="e">🌙</span><span><b>3 сферы саморазвития:</b> сон, питание, физическая активность</span></div>
+      <div><span class="e">🔥</span><span><b>55 челленджей</b></span></div>
+      <div><span class="e">🎮</span><span><b>Игровой формат:</b> очки, статусы, уровни</span></div>
+      <div><span class="e">🎁</span><span><b>Бонусы и призы</b></span></div>
+      <div><span class="e">👥</span><span><b>Сильное окружение</b></span></div>
+    </div>
+    <h3 style="margin-top:28px">Загляни внутрь клуба <span class="e">👀</span></h3>
+    <div class="car">
+      <div class="car-track" id="car-track">
+        ${SLIDES.map((s,n)=>`<button class="car-slide" data-n="${n}" aria-label="Открыть: ${s.alt}"><img src="img/${s.f}" alt="${s.alt}" width="1080" height="1350" ${n>1?'loading="lazy"':''}></button>`).join('')}
+      </div>
+      <button class="car-nav prev" id="car-prev" aria-label="Назад">‹</button>
+      <button class="car-nav next" id="car-next" aria-label="Вперёд">›</button>
+    </div>
+    <div class="car-dots" id="car-dots">${SLIDES.map((s,n)=>`<i class="${n?'':'on'}"></i>`).join('')}</div>
+    <p class="car-hint">Листай вбок, нажми, чтобы увеличить</p>
+    <h3 style="margin-top:22px">Хватит ждать подходящего момента <span class="e">⏰</span></h3>
+    <ol class="path">
+      <li><span class="e">1️⃣</span><span>Заходи в Челленджологию</span></li>
+      <li><span class="e">2️⃣</span><span>Определи свою цель</span></li>
+      <li><span class="e">3️⃣</span><span>Выбирай челлендж</span></li>
+      <li><span class="e">4️⃣</span><span>Начинай системно менять себя вместе с людьми, которые тоже хотят стать лучше</span></li>
+      <li><span class="e">5️⃣</span><span>Получай бонусы и призы за регулярность и саморазвитие</span></li>
+    </ol>
+    ${JOIN_URL ? `<a class="cta shine" href="${JOIN_URL}" target="_blank" rel="noopener">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></a>`
+               : `<button class="cta shine" id="join">ХОЧУ В КЛУБ <span class="e" style="letter-spacing:0">🚀</span></button>`}
+    <p class="note">Откроется Телеграм-бот: там подробно о клубе, стоимость и оплата</p>
+  </div>`;
+}
+
 /* ===== КАРУСЕЛЬ «Загляни внутрь клуба» =====
    Картинки лежат в папке img. Чтобы поменять порядок или добавить слайд — правь этот список. */
 const SLIDES = [
@@ -563,7 +594,12 @@ function initCarousel(){
   document.getElementById('car-prev').onclick = () => go(cur()-1);
   document.getElementById('car-next').onclick = () => go(cur()+1);
   dots.forEach((d,k)=> d.onclick = () => go(k));
-  slides.forEach(s => s.onclick = () => openLightbox(+s.dataset.n));
+  // на компьютере карусель можно тянуть мышкой, как пальцем на телефоне
+  let down = null, moved = false;
+  track.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = {x:e.clientX, s:track.scrollLeft}; moved = false; });
+  window.addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - down.x; if (Math.abs(dx) > 5 && !moved) { moved = true; track.classList.add('grab'); } if (moved) track.scrollLeft = down.s - dx; });
+  window.addEventListener('pointerup', () => { if (!down) return; down = null; if (moved) { track.classList.remove('grab'); go(cur()); setTimeout(() => moved = false, 0); } });
+  slides.forEach(s => s.onclick = e => { if (moved) { e.preventDefault(); moved = false; return; } openLightbox(+s.dataset.n); });
 }
 let lbN = 0;
 function openLightbox(n){
